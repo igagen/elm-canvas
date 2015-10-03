@@ -13,8 +13,6 @@ h = 768
 
 c = circle 512 384 32
 
-center = (512, 384)
-
 styleCmds =
   [ strokeColor red
   , shadowBlur 10
@@ -75,7 +73,7 @@ view model result =
   let
     drawImg = case result of
       Err _ -> []
-      Ok img -> [drawImage 512 384 img]
+      Ok img -> [fillPattern img Repeat, fillCircle (circle 200 200 128)]
   in
     canvas (model.w, model.h) (model.commands ++ drawImg)
 

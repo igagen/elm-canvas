@@ -30,6 +30,8 @@ Elm.Native.Canvas.make = function(elm) {
       StrokeColor: function(cmd) {c.strokeStyle = toCss(cmd._0);},
       FillGrad: function(cmd) { c.fillStyle = gradient(cmd); },
       StrokeGrad: function(cmd) { c.strokeStyle = gradient(cmd); },
+      FillPattern: function(cmd) { c.fillStyle = getPattern(cmd); },
+      StrokePattern: function(cmd) { c.strokeStyle = getPattern(cmd); },
 
       LineWidth: function(cmd) { c.lineWidth = cmd._0; },
       LineCapStyle: function(cmd) { c.lineCap = cmd._0.ctor.slice(0, -3).toLowerCase(); },
@@ -149,6 +151,28 @@ Elm.Native.Canvas.make = function(elm) {
       return g;
     }
 
+    // Return cached pattern if present, otherwise create it
+    function getPattern(cmd) {
+      var image = cmd._0._0;
+      var repeat = {
+        Repeat: 'repeat',
+        RepeatX: 'repeat-x',
+        RepeatY: 'repeat-y',
+        NoRepeat: 'no-repeat'
+      }[cmd._0._1.ctor];
+
+      model.cache.patterns = model.cache.patterns || {};
+      var patterns = model.cache.patterns;
+      patterns[image.src] = patterns[image.src] || {};
+      var pattern = patterns[image.src][repeat];
+
+      if (!pattern) {
+        pattern = patterns[image.src][repeat] = c.createPattern(image, repeat);
+      }
+
+      return pattern;
+    }
+
     function runCommands(commands) {
       var cmds = NativeList.toArray(commands);
       for (var i = 0; i < cmds.length; i++) {
@@ -169,7 +193,6 @@ Elm.Native.Canvas.make = function(elm) {
     var w = dimensions._0;
     var h = dimensions._1;
 
-    // 'Render' to the DOM
     function render(model) {
       var div = createNode('div');
       div.style.overflow = 'hidden';

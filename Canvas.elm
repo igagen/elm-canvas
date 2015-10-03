@@ -64,6 +64,15 @@ type alias Path = List PathMethod
 
 type Image = Image
 
+type PatternRepeat
+  = Repeat
+  | RepeatX
+  | RepeatY
+  | NoRepeat
+
+type Pattern
+  = PatternImage Image PatternRepeat
+
 -- Commands
 
 type Command
@@ -80,6 +89,8 @@ type Command
   | StrokeColor Color
   | FillGrad Gradient
   | StrokeGrad Gradient
+  | FillPattern Pattern
+  | StrokePattern Pattern
 
   | LineWidth Float
   | LineCapStyle LineCap
@@ -122,6 +133,8 @@ fillColor color = FillColor color
 strokeColor color = StrokeColor color
 fillGrad grad = FillGrad grad
 strokeGrad grad = StrokeGrad grad
+fillPattern image repeat = FillPattern (PatternImage image repeat)
+strokePattern image repeat = StrokePattern (PatternImage image repeat)
 
 lineWidth width = LineWidth width
 lineCap cap = LineCapStyle cap

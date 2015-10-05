@@ -71,11 +71,16 @@ model = Signal.constant
 view : Model -> Result String Image -> Element
 view model result =
   let
+    bg = canvas "bg" (model.w, model.h) [fillColor red, fillRect 0 0 w h]
+
     drawImg = case result of
       Err _ -> []
-      Ok img -> [fillPattern img Repeat, fillCircle (circle 200 200 128)]
+      Ok img -> [fillCanvas "bg" Repeat, fillCircle (circle 200 200 128)]
   in
-    canvas (model.w, model.h) (model.commands ++ drawImg)
+    layers
+      [ bg
+      , canvas "fg" (model.w, model.h) (model.commands ++ drawImg)
+      ]
 
 main : Signal Element
 main = Signal.map2 view model results.signal
@@ -83,7 +88,7 @@ main = Signal.map2 view model results.signal
 results : Signal.Mailbox (Result String Image)
 results = Signal.mailbox (Err "Image not found")
 
-imageSrc = "http://inkarnate.com/images/map-builder/skins/darkfantasy-world/objects/compass.png"
+imageSrc = "http://inkarnate.com/images/map-builder/skins/darkfantasy-world/textures/land.jpg"
 
 port updateImage : Task String ()
 port updateImage =

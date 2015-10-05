@@ -14,6 +14,8 @@ Elm.Native.Canvas.make = function(elm) {
   var toCss = Elm.Native.Color.make(elm).toCss;
   var Task = Elm.Native.Task.make(elm);
 
+  var canvases = {};
+
   function drawCanvas(model) {
     var c = model.cache.context;
 
@@ -161,16 +163,24 @@ Elm.Native.Canvas.make = function(elm) {
         NoRepeat: 'no-repeat'
       }[cmd._0._1.ctor];
 
-      model.cache.patterns = model.cache.patterns || {};
-      var patterns = model.cache.patterns;
-      patterns[image.src] = patterns[image.src] || {};
-      var pattern = patterns[image.src][repeat];
-
-      if (!pattern) {
-        pattern = patterns[image.src][repeat] = c.createPattern(image, repeat);
+      var key = null;
+      if (image.src) {
+        key = image.src;
+      }
+      else if (canvases[image]) {
+        key = image;
+        image = canvases[image];
+      }
+      else {
+        throw("Unknown element type for image: " + image);
       }
 
-      return pattern;
+      model.cache.patterns = model.cache.patterns || {};
+      var patterns = model.cache.patterns;
+      patterns[key] = patterns[key] || {};
+      patterns[key][repeat] = patterns[key][repeat] || c.createPattern(image, repeat);
+
+      return patterns[key][repeat];
     }
 
     function runCommands(commands) {
@@ -189,7 +199,7 @@ Elm.Native.Canvas.make = function(elm) {
     runCommands(model.commands);
   }
 
-	function canvas(dimensions, commands) {
+	function canvas(id, dimensions, commands) {
     var w = dimensions._0;
     var h = dimensions._1;
 
@@ -201,6 +211,8 @@ Elm.Native.Canvas.make = function(elm) {
 
       model.cache.canvas = canvas;
       model.cache.context = context;
+
+      canvases[model.id] = canvas;
 
       update(div, model, model);
 
@@ -235,7 +247,8 @@ Elm.Native.Canvas.make = function(elm) {
         commands: commands,
         cache: {},
         w: w,
-        h: h
+        h: h,
+        id: id
       }
     };
 
@@ -259,7 +272,7 @@ Elm.Native.Canvas.make = function(elm) {
 	}
 
 	return elm.Native.Canvas.values = {
-		canvas: F2(canvas),
+		canvas: F3(canvas),
     loadImage: loadImage
 	};
 };

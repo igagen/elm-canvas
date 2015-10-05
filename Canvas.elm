@@ -71,7 +71,8 @@ type PatternRepeat
   | NoRepeat
 
 type Pattern
-  = PatternImage Image PatternRepeat
+  = ImagePattern Image PatternRepeat
+  | CanvasPattern String PatternRepeat
 
 -- Commands
 
@@ -91,6 +92,8 @@ type Command
   | StrokeGrad Gradient
   | FillPattern Pattern
   | StrokePattern Pattern
+  | FillCanvas Element
+  | StrokeCanvas Element
 
   | LineWidth Float
   | LineCapStyle LineCap
@@ -133,8 +136,10 @@ fillColor color = FillColor color
 strokeColor color = StrokeColor color
 fillGrad grad = FillGrad grad
 strokeGrad grad = StrokeGrad grad
-fillPattern image repeat = FillPattern (PatternImage image repeat)
-strokePattern image repeat = StrokePattern (PatternImage image repeat)
+fillImage image repeat = FillPattern (ImagePattern image repeat)
+strokeImage image repeat = StrokePattern (ImagePattern image repeat)
+fillCanvas id repeat = FillPattern (CanvasPattern id repeat)
+strokeCanvas id repeat = StrokePattern (CanvasPattern id repeat)
 
 lineWidth width = LineWidth width
 lineCap cap = LineCapStyle cap
@@ -181,5 +186,5 @@ loadImage = Native.Canvas.loadImage
 
 -- Canvas
 
-canvas : (Int, Int) -> List Command -> Element
+canvas : String -> (Int, Int) -> List Command -> Element
 canvas = Native.Canvas.canvas

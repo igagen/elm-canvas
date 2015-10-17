@@ -208,26 +208,32 @@ Elm.Native.Canvas.make = function(elm) {
 
     function render(model) {
       var canvas = createNode('canvas');
-      var context = canvas.getContext('2d');
 
-      model.cache.context = context;
+      canvas.style.display = "block";
+      canvas.style.position = "absolute";
 
+      model.cache.context = canvas.getContext('2d');
       canvases[model.id] = canvas;
 
+      resize(canvas, model.w, model.h);
       update(canvas, model, model);
 
       return canvas;
     }
 
+    function resize(canvas, w, h) {
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      canvas.width = w;
+      canvas.height = h;
+    }
+
     function update(canvas, oldModel, newModel) {
       newModel.cache = oldModel.cache;
 
-      canvas.style.width = oldModel.w + 'px';
-      canvas.style.height = oldModel.h + 'px';
-      canvas.style.display = "block";
-      canvas.style.position = "absolute";
-      canvas.width = oldModel.w;
-      canvas.height = oldModel.h;
+      if (newModel.w != oldModel.w || newModel.h != oldModel.h) {
+        resize(canvas, newModel.w, newModel.h);
+      }
 
       drawCanvas(newModel);
 

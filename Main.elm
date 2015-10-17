@@ -76,12 +76,17 @@ type Action = Resize (Int, Int)
 update : Action -> Model -> Model
 update action model =
   case action of
-    Resize (w, h) -> model
+    Resize (w, h) ->
+      { model
+      | w <- w
+      , h <- h
+      , commands <- [fillColor (rgb 32 32 32), fillRect 0 0 (toFloat w) (toFloat h)] ++ colorWheel
+      }
 
 -- View
 
-view : (Int, Int) -> Model -> Element
-view (w, h) model =
+view : Model -> Element
+view model =
   layers [canvas "fg" (model.w, model.h) model.commands]
 
 
@@ -98,7 +103,7 @@ model : Signal Model
 model = Signal.foldp update initialModel input
 
 main : Signal Element
-main = Signal.map2 view Window.dimensions model
+main = Signal.map view model
 
 
 -- results : Signal.Mailbox (Result String Image)

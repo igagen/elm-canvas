@@ -28,7 +28,10 @@ Elm.Native.Canvas.make = function(elm) {
 
       DrawImage: function(cmd) { c.drawImage(cmd._2, cmd._0, cmd._1); },
 
-      FillColor: function(cmd) {c.fillStyle = toCss(cmd._0);},
+      FillColor: function(cmd) {
+        var color = toCss(cmd._0);
+        c.fillStyle = toCss(cmd._0);
+      },
       StrokeColor: function(cmd) {c.strokeStyle = toCss(cmd._0);},
       FillGrad: function(cmd) { c.fillStyle = gradient(cmd); },
       StrokeGrad: function(cmd) { c.strokeStyle = gradient(cmd); },

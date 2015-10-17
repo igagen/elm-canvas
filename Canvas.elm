@@ -124,8 +124,8 @@ strokeRect x y w h = StrokePath [Rect (rect x y w h)]
 fillPath path = FillPath path
 strokePath path = StrokePath path
 
-fillCircle circle = FillPath [Arc circle]
-strokeCircle circle = StrokePath [Arc circle]
+fillCircle circle = FillPath [circle]
+strokeCircle circle = StrokePath [circle]
 
 fillText text x y = FillText text x y
 strokeText text x y = StrokeText text x y
@@ -170,7 +170,7 @@ rect x y w h = { x = x, y = y, w = w, h = h }
 circle x y r = arc x y r 0.0 (2.0 * pi)
 
 arcWithDir x y r startAngle endAngle ccw =
-  { x = x, y = y, r = r, startAngle = startAngle, endAngle = endAngle, ccw = ccw }
+  Arc { x = x, y = y, r = r, startAngle = startAngle, endAngle = endAngle, ccw = ccw }
 
 arc x y r startAngle endAngle = arcWithDir x y r startAngle endAngle False
 

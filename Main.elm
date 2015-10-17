@@ -7,18 +7,9 @@ import Mouse
 import Basics exposing (pi)
 import Color exposing (..)
 import Task exposing (Task, andThen, toResult)
+import Window
 
-w = 1024
-h = 768
-
-c = circle 512 384 32
-
-styleCmds = []
-
-linGrad = linear (0, 0) (w, h)
-  [ (0, green)
-  , (1, lightBlue)
-  ]
+-- Model
 
 softBrush x y r =
   let
@@ -62,8 +53,7 @@ wheelArc i =
     , fillPath [arc x y r startAngle endAngle, lineTo x y]
     ]
 
--- commands = styleCmds ++ drawCmds
-commands = [fillColor (rgb 32 32 32), fillRect 0 0 w h] ++ styleCmds ++ colorWheel
+commands = [fillColor (rgb 32 32 32), fillRect 0 0 1024 768] ++ colorWheel
 
 type alias Model =
   { w : Int
@@ -71,33 +61,56 @@ type alias Model =
   , commands : List Command
   }
 
-model = Signal.constant
+initialModel : Model
+initialModel =
   { w = 1024
   , h = 768
   , commands = commands
   }
 
-view : Model -> Result String Image -> Element
-view model result =
-  let
-    bg = canvas "bg" (model.w, model.h) [fillColor red, fillRect 0 0 w h]
 
-    drawImg = case result of
-      Err _ -> []
-      Ok img -> []
-  in
-    layers
-      [ canvas "fg" (model.w, model.h) (model.commands ++ drawImg)
-      ]
+-- Update
+
+type Action = Resize (Int, Int)
+
+update : Action -> Model -> Model
+update action model =
+  case action of
+    Resize (w, h) ->
+      { model
+      | w <- w
+      , h <- h
+      , commands <- [fillColor (rgb 32 32 32), fillRect 0 0 (toFloat w) (toFloat h)] ++ colorWheel
+      }
+
+-- View
+
+view : (Int, Int) -> Model -> Element
+view dimensions model =
+  canvas "fg" (model.w, model.h) model.commands
+
+
+-- Signals
+
+dimensions : Signal Action
+dimensions = Signal.map (\(w, h) -> Resize (w, h)) Window.dimensions
+
+input : Signal Action
+input =
+  Signal.mergeMany [dimensions]
+
+model : Signal Model
+model = Signal.foldp update initialModel input
 
 main : Signal Element
-main = Signal.map2 view model results.signal
+main = Signal.map2 view Window.dimensions model
 
-results : Signal.Mailbox (Result String Image)
-results = Signal.mailbox (Err "Image not found")
 
-imageSrc = "http://inkarnate.com/images/map-builder/skins/darkfantasy-world/textures/land.jpg"
+-- results : Signal.Mailbox (Result String Image)
+-- results = Signal.mailbox (Err "Image not found")
 
-port runner : Task String ()
-port runner =
-  (loadImage imageSrc |> Task.toResult) `andThen` Signal.send results.address
+-- imageSrc = "http://inkarnate.com/images/map-builder/skins/darkfantasy-world/textures/land.jpg"
+
+-- port runner : Task String ()
+-- port runner =
+--   (loadImage imageSrc |> Task.toResult) `andThen` Signal.send results.address

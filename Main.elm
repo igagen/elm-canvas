@@ -76,18 +76,13 @@ type Action = Resize (Int, Int)
 update : Action -> Model -> Model
 update action model =
   case action of
-    Resize (w, h) ->
-      { model
-      | w <- w
-      , h <- h
-      , commands <- [fillColor (rgb 32 32 32), fillRect 0 0 (toFloat w) (toFloat h)] ++ colorWheel
-      }
+    Resize (w, h) -> model
 
 -- View
 
 view : (Int, Int) -> Model -> Element
 view (w, h) model =
-  layers [canvas "fg" (w, h) model.commands]
+  layers [canvas "fg" (model.w, model.h) model.commands]
 
 
 -- Signals

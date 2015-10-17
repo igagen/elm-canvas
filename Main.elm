@@ -86,8 +86,8 @@ update action model =
 -- View
 
 view : (Int, Int) -> Model -> Element
-view dimensions model =
-  canvas "fg" (model.w, model.h) model.commands
+view (w, h) model =
+  layers [canvas "fg" (w, h) model.commands]
 
 
 -- Signals

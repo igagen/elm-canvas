@@ -207,25 +207,20 @@ Elm.Native.Canvas.make = function(elm) {
     var h = dimensions._1;
 
     function render(model) {
-      var div = createNode('div');
-      div.style.overflow = 'hidden';
       var canvas = createNode('canvas');
       var context = canvas.getContext('2d');
 
-      model.cache.canvas = canvas;
       model.cache.context = context;
 
       canvases[model.id] = canvas;
 
-      update(div, model, model);
+      update(canvas, model, model);
 
-      return div;
+      return canvas;
     }
 
-    function update(div, oldModel, newModel) {
+    function update(canvas, oldModel, newModel) {
       newModel.cache = oldModel.cache;
-
-      var canvas = newModel.cache.canvas;
 
       canvas.style.width = oldModel.w + 'px';
       canvas.style.height = oldModel.h + 'px';
@@ -236,9 +231,7 @@ Elm.Native.Canvas.make = function(elm) {
 
       drawCanvas(newModel);
 
-      div.appendChild(canvas);
-
-      return div;
+      return canvas;
     }
 
     var elem = {

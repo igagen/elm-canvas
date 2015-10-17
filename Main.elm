@@ -8,6 +8,7 @@ import Basics exposing (pi)
 import Color exposing (..)
 import Task exposing (Task, andThen, toResult)
 import Window
+import Primer
 
 -- Model
 
@@ -93,7 +94,7 @@ view model =
 -- Signals
 
 dimensions : Signal Action
-dimensions = Signal.map (\(w, h) -> Resize (w, h)) Window.dimensions
+dimensions = Signal.map (\(w, h) -> Resize (w, h)) (Primer.prime Window.dimensions)
 
 input : Signal Action
 input =
